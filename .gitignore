@@ -1,0 +1,14 @@
+.DS_Store
+
+# Swift / Xcode build artifacts
+.build/
+.swiftpm/
+DerivedData/
+
+# Local app/runtime artifacts
+dist/NYvoiceApp.app/
+dist/NYvoiceApp.zip
+.voice-text/
+
+# Local editor settings
+.vscode/
