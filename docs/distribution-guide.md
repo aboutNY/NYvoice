@@ -20,8 +20,8 @@
 以下は **順番どおりに1つずつ** 実行する。
 
 1. `swift build -c release`
-2. `cp /Users/nagaishi/NYvoice/.build/release/NYvoiceApp /Users/nagaishi/NYvoice/dist/NYvoiceApp.app/Contents/MacOS/NYvoiceApp`
-3. `cp /Users/nagaishi/NYvoice/.build/release/NYvoiceApp /Applications/NYvoiceApp.app/Contents/MacOS/NYvoiceApp`
+2. `cp "$PWD/.build/release/NYvoiceApp" "$PWD/dist/NYvoiceApp.app/Contents/MacOS/NYvoiceApp"`
+3. `cp "$PWD/.build/release/NYvoiceApp" "/Applications/NYvoiceApp.app/Contents/MacOS/NYvoiceApp"`
 4. `codesign --force --deep --sign - /Applications/NYvoiceApp.app`
 5. `open -a /Applications/NYvoiceApp.app`
 

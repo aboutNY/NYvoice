@@ -12,3 +12,7 @@ dist/NYvoiceApp.zip
 
 # Local editor settings
 .vscode/
+
+# Internal operation docs (keep local)
+Agents.md
+.steering/

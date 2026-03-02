@@ -27,10 +27,10 @@
 1. Whisper.cpp 実行ファイルをインストール
    - 例: `brew install whisper-cpp`
 2. モデルファイルを配置
-   - 例: `/Users/nagaishi/whisper-models/ggml-base.bin`
+   - 例: `$HOME/whisper-models/ggml-base.bin`
 3. Settings で以下を設定して保存
    - `Whisper binary path`: `/opt/homebrew/bin/whisper-cli`（Intel Mac は `/usr/local/bin/whisper-cli` の場合あり）
-   - `Whisper model path`: `/Users/nagaishi/whisper-models/ggml-base.bin`
+   - `Whisper model path`: `$HOME/whisper-models/ggml-base.bin`
 4. `Run Environment Check` を再実行
 
 ## 7. 完了条件

@@ -4,7 +4,8 @@
 記載どおりに実行してください。
 
 ## 1. この手順で実施すること
-- NYvoiceアプリを `/Applications` に配置
+- NYvoice を GitHub からクローン
+- ローカルビルドして `dist/NYvoiceApp.app` を起動
 - Ollama のインストールとモデル取得
 - `whisper-cli`（whisper.cpp実行ファイル）とモデル配置
 - NYvoiceの設定反映
@@ -14,38 +15,51 @@
 ## 2. 前提条件
 - macOS
 - 管理者権限を持つユーザー
-- 配布された `NYvoiceApp.zip`
+- GitHub アクセス権（private repoを読めること）
 - インターネット接続（Ollamaモデル取得時のみ）
 
 ## 3. 先にまとめて実行するコマンド（そのままコピペ可）
 以下をターミナルで順番に実行してください。
 
 ```bash
-# 1) 配布Zipを展開して /Applications へ配置
-cd ~/Downloads
-unzip -o NYvoiceApp.zip
-cp -R ./NYvoiceApp.app /Applications/NYvoiceApp.app
+# 1) 作業ディレクトリ作成とリポジトリ取得
+mkdir -p "$HOME/work"
+cd "$HOME/work"
+git clone https://github.com/aboutNY/NYvoice.git
+cd NYvoice
 
-# 2) Homebrew が未導入ならインストール（導入済みならスキップ）
+# 2) Xcode Command Line Tools（未導入なら）
+xcode-select --install 2>/dev/null || true
+
+# 3) Homebrew が未導入ならインストール（導入済みならスキップ）
 command -v brew >/dev/null 2>&1 || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# 3) whisper.cpp をインストール
+# 4) whisper.cpp をインストール
 brew install whisper-cpp
 
-# 4) whisperモデル配置ディレクトリ作成
+# 5) whisperモデル配置ディレクトリ作成
 mkdir -p "$HOME/whisper-models"
 
-# 5) ベースモデルを取得（チーム配布モデルがある場合はこの行をスキップ可）
-curl -L --fail -o "$HOME/whisper-models/ggml-large-v3-turbo.bin" https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
+# 6) モデル取得
+curl -L --fail -o "$HOME/whisper-models/ggml-base.bin" https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.bin
 
-# 6) Ollama インストール（導入済みならスキップ）
+# 7) Ollama インストール（導入済みならスキップ）
 brew install --cask ollama
 
-# 7) Ollama 起動（既に起動中ならそのままでOK）
+# 8) Ollama 起動（既に起動中ならそのままでOK）
 open -a Ollama
 
-# 8) Ollama モデル取得（NYvoice既定）
+# 9) Ollama モデル取得（NYvoice既定）
 ollama pull qwen2.5:7b
+
+# 10) NYvoice をビルド
+swift build -c release
+
+# 11) distアプリにビルド成果物を反映
+cp .build/release/NYvoiceApp dist/NYvoiceApp.app/Contents/MacOS/NYvoiceApp
+
+# 12) 起動
+open -a "$PWD/dist/NYvoiceApp.app"
 ```
 
 ## 4. インストール結果の確認（コピペ可）
@@ -60,21 +74,19 @@ ls -lh "$HOME/whisper-models/ggml-base.bin"
 
 # Ollama API 応答確認（JSONが返ればOK）
 curl -s http://127.0.0.1:11434/api/tags
+
+# NYvoice バイナリ存在確認
+ls -lh "$HOME/work/NYvoice/.build/release/NYvoiceApp"
 ```
 
 ## 5. NYvoice の初回起動
 ```bash
-open -a /Applications/NYvoiceApp.app
+cd "$HOME/work/NYvoice"
+open -a "$PWD/dist/NYvoiceApp.app"
 ```
 
-初回起動でmacOSの警告が出た場合:
-- 「開けない」と表示されたら `システム設定 > プライバシーとセキュリティ` の下部にある「このまま開く」を選択
-- それでも起動できない場合は以下を実行後に再起動
-
-```bash
-xattr -dr com.apple.quarantine /Applications/NYvoiceApp.app
-open -a /Applications/NYvoiceApp.app
-```
+補足:
+- ローカルビルド実行のため、ZIP配布版より Gatekeeper 警告は出にくくなります。
 
 ## 6. NYvoice 設定値（UIにそのまま入力）
 メニューバーのNYvoiceアイコンから `Open Settings` を開き、以下を設定して `Save` を押してください。
@@ -158,7 +170,7 @@ ollama pull qwen2.5:7b
 必要時のみ（最終手段）:
 ```bash
 tccutil reset Accessibility com.nyvoice.dev
-open -a /Applications/NYvoiceApp.app
+open -a "$HOME/work/NYvoice/dist/NYvoiceApp.app"
 ```
 
 ### 10.5 録音はできるが文字が挿入されない
@@ -168,9 +180,18 @@ open -a /Applications/NYvoiceApp.app
 - `Run Environment Check` を再実行してエラー内容を確認
 
 ## 11. セットアップ完了チェックリスト
-- `/Applications/NYvoiceApp.app` から起動できる
+- `~/work/NYvoice/dist/NYvoiceApp.app` から起動できる
 - `Run Environment Check` でエラーが出ない
 - `Option` ダブルプレスで録音開始/停止できる
 - 発話した内容が入力欄に挿入される
+
+## 12. アプリ更新手順（pull後）
+```bash
+cd "$HOME/work/NYvoice"
+git pull
+swift build -c release
+cp .build/release/NYvoiceApp dist/NYvoiceApp.app/Contents/MacOS/NYvoiceApp
+open -a "$PWD/dist/NYvoiceApp.app"
+```
 
 以上で初回セットアップは完了です。
